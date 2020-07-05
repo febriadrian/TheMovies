@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GenresViewController" customModule="TheMovies" customModuleProvider="target">
+            <connections>
+                <outlet property="contentView" destination="nlA-QO-83k" id="Bbb-u0-VT6"/>
+                <outlet property="doneButton" destination="Flr-O7-hUq" id="t4D-Ml-sbU"/>
+                <outlet property="tableView" destination="Tde-nn-Iar" id="dOG-7W-JNx"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nlA-QO-83k">
+                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="h50-yK-mke">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
+                            <subviews>
+                                <tableView clipsSubviews="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" keyboardDismissMode="onDrag" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Tde-nn-Iar">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <inset key="separatorInset" minX="12" minY="0.0" maxX="12" maxY="0.0"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-1" id="bqG-0X-4Tv"/>
+                                        <outlet property="delegate" destination="-1" id="1ll-NP-3H2"/>
+                                    </connections>
+                                </tableView>
+                                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Flr-O7-hUq">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="Fqq-MZ-b82"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                    <state key="normal" title="DONE">
+                                        <color key="titleColor" red="0.0039215686269999999" green="0.70588235290000001" blue="0.89411764709999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="didTapDoneButton:" destination="-1" eventType="touchUpInside" id="OuE-7a-chf"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="h50-yK-mke" secondAttribute="bottom" id="BAa-uJ-pXt"/>
+                        <constraint firstItem="h50-yK-mke" firstAttribute="leading" secondItem="nlA-QO-83k" secondAttribute="leading" id="Thw-PX-pVT"/>
+                        <constraint firstItem="h50-yK-mke" firstAttribute="top" secondItem="nlA-QO-83k" secondAttribute="top" id="ipC-32-pXB"/>
+                        <constraint firstAttribute="trailing" secondItem="h50-yK-mke" secondAttribute="trailing" id="qlJ-18-SKn"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="nlA-QO-83k" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="APZ-HT-zFU"/>
+                <constraint firstItem="nlA-QO-83k" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="LRX-fM-Rbr"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="nlA-QO-83k" secondAttribute="bottom" id="ftp-tt-vfY"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="nlA-QO-83k" secondAttribute="trailing" id="v7q-Nk-SDn"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
+            <point key="canvasLocation" x="137.68115942028987" y="129.91071428571428"/>
+        </view>
+    </objects>
+</document>
