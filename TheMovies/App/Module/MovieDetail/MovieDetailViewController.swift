@@ -119,6 +119,14 @@ class MovieDetailViewController: UIViewController {
                 self.tableView.scrollToRow(at: [0, 0], at: .none, animated: true)
             }
         }
+
+        if segmentedControl.selectedSegmentIndex == 0 ||
+            segmentedControl.selectedSegmentIndex == 1 && recommend?.count == 0 ||
+            segmentedControl.selectedSegmentIndex == 2 && similar?.count == 0 {
+            tableView.allowsSelection = false
+        } else {
+            tableView.allowsSelection = true
+        }
     }
 }
 
@@ -199,14 +207,14 @@ extension MovieDetailViewController: UITableViewDataSource, UITableViewDelegate 
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch segmentedControl.selectedSegmentIndex {
-        case 0:
-            return
         case 1:
             guard let id = recommend?[indexPath.row].id else { return }
             router?.navToMovieDetail(id: id)
-        default:
+        case 2:
             guard let id = similar?[indexPath.row].id else { return }
             router?.navToMovieDetail(id: id)
+        default:
+            break
         }
     }
 
