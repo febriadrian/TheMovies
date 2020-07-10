@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8AABDD06F1327BC62BE3ECBBB02AF715"
-               BuildableName = "libAlamofireNetworkActivityLogger.a"
+               BuildableName = "AlamofireNetworkActivityLogger.framework"
                BlueprintName = "AlamofireNetworkActivityLogger"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
