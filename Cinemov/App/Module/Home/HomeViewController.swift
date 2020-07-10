@@ -43,6 +43,7 @@ class HomeViewController: UIViewController {
     let pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
     var viewControllerList: [UIViewController] = []
     var previousMenu: Int = 0
+    var selectedIndex: Int = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,6 +102,12 @@ class HomeViewController: UIViewController {
 
         addChild(pageViewController)
         pageViewController.didMove(toParent: self)
+
+        for v in pageViewController.view.subviews {
+            if v.isKind(of: UIScrollView.self) {
+                (v as! UIScrollView).delegate = self as UIScrollViewDelegate
+            }
+        }
     }
 
     private func updateIndicatorViewPosition(menu: Int) {
@@ -109,6 +116,8 @@ class HomeViewController: UIViewController {
             UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
                 self.leadingIndicatorViewConstraint.constant = (width * CGFloat(menu))
                 self.view.layoutIfNeeded()
+
+                print("leadingIndicatorViewConstraint = \(self.leadingIndicatorViewConstraint.constant)")
             }, completion: nil)
         }
     }
@@ -163,10 +172,22 @@ extension HomeViewController: UIPageViewControllerDataSource, UIPageViewControll
             if let currentViewController = pageViewController.viewControllers?.first,
                 let index = viewControllerList.firstIndex(of: currentViewController) {
                 if let button = menuButtons.filter({ $0.tag == index }).first {
+                    selectedIndex = index
                     handleMenuSelection(button)
                 }
             }
         }
+    }
+}
+
+extension HomeViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let xOffset = scrollView.contentOffset.x
+        let count = CGFloat(viewControllerList.count)
+        let width = view.bounds.width / count
+        let increment = CGFloat(selectedIndex) * width
+        let constant = ((xOffset - view.bounds.width) / count) + increment
+        leadingIndicatorViewConstraint.constant = constant
     }
 }
 

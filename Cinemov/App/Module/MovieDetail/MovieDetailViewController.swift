@@ -308,7 +308,7 @@ extension MovieDetailViewController: UIScrollViewDelegate {
                 hideTopBarsView()
                 viewTopConstraint.constant = constant
             }
-        } else if yOffset <= 0 {
+        } else {
             hideTopBarsView()
             viewTopConstraint.constant = constant
         }
