@@ -286,9 +286,11 @@
             <connections>
                 <outlet property="budgetLabel" destination="GND-ph-ZNF" id="lT3-kN-gjS"/>
                 <outlet property="castCollectionView" destination="bfW-FB-WW7" id="lVk-Au-sSW"/>
+                <outlet property="castView" destination="Oyi-go-ils" id="8OO-in-vGK"/>
                 <outlet property="companiesLabel" destination="UCj-yw-UR2" id="h7M-nO-p10"/>
                 <outlet property="countriesLabel" destination="XN5-GW-GeD" id="b0E-09-cz0"/>
                 <outlet property="crewCollectionView" destination="dFf-Zw-6ND" id="wYq-iw-gZK"/>
+                <outlet property="crewView" destination="9pb-QK-Jcz" id="89D-o2-KSJ"/>
                 <outlet property="genresLabel" destination="z6x-v1-zJL" id="FfX-59-hXI"/>
                 <outlet property="homepageLabel" destination="jXG-FS-XKx" id="NIh-6m-fzo"/>
                 <outlet property="originalTitleLabel" destination="wgI-Lk-S7B" id="Fg1-yc-F87"/>

@@ -20,7 +20,9 @@ class MovieDetailInfoTableViewCell: UITableViewCell {
     @IBOutlet weak var taglineLabel: UILabel!
     @IBOutlet weak var castCollectionView: UICollectionView!
     @IBOutlet weak var crewCollectionView: UICollectionView!
-    
+    @IBOutlet weak var castView: UIView!
+    @IBOutlet weak var crewView: UIView!
+
     var handleUpdateCell: (() -> Void)?
 
     var detail: MovieDetailModel.MVDetailModel? {
@@ -40,13 +42,21 @@ class MovieDetailInfoTableViewCell: UITableViewCell {
 
     var cast: [MovieDetailModel.PeopleModel]? {
         didSet {
-            castCollectionView.reloadData()
+            if cast?.count == 0 {
+                castView.isHidden = true
+            } else {
+                castCollectionView.reloadData()
+            }
         }
     }
 
     var crew: [MovieDetailModel.PeopleModel]? {
         didSet {
-            crewCollectionView.reloadData()
+            if crew?.count == 0 {
+                crewView.isHidden = true
+            } else {
+                crewCollectionView.reloadData()
+            }
         }
     }
 
@@ -62,7 +72,7 @@ class MovieDetailInfoTableViewCell: UITableViewCell {
         crewCollectionView.dataSource = self
         castCollectionView.registerCellType(PeopleCollectionViewCell.self)
         crewCollectionView.registerCellType(PeopleCollectionViewCell.self)
-        
+
         let tap = UITapGestureRecognizer(target: self, action: #selector(didTapContentLabel))
         overviewLabel.addGestureRecognizer(tap)
     }
@@ -70,7 +80,7 @@ class MovieDetailInfoTableViewCell: UITableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
-    
+
     @objc private func didTapContentLabel() {
         if overviewLabel.numberOfLines == 0 {
             overviewLabel.numberOfLines = 4
