@@ -10,7 +10,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="HomeViewController" customModule="Cinemov" customModuleProvider="target">
             <connections>
-                <outlet property="leadingIndicatorViewConstraint" destination="e1M-tg-vYS" id="qvq-7m-rWI"/>
+                <outlet property="leadingIndicatorConstraint" destination="e1M-tg-vYS" id="qvq-7m-rWI"/>
                 <outlet property="menuView" destination="c1X-rO-mP3" id="Nqj-S0-yGk"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
                 <outletCollection property="menuButtons" destination="dzh-QN-vlx" collectionClass="NSMutableArray" id="Xs3-qM-EQK"/>
@@ -44,7 +44,7 @@
                                                 <color key="titleColor" red="0.050980392159999999" green="0.1450980392" blue="0.2470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
                                             <connections>
-                                                <action selector="handleMenuSelection:" destination="-1" eventType="touchUpInside" id="g0s-j8-sge"/>
+                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="gIW-6S-vK0"/>
                                             </connections>
                                         </button>
                                         <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bDO-0z-HZj" userLabel="Playing">
@@ -58,7 +58,7 @@
                                                 <color key="titleColor" red="0.050980392159999999" green="0.1450980392" blue="0.2470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
                                             <connections>
-                                                <action selector="handleMenuSelection:" destination="-1" eventType="touchUpInside" id="iCV-Dl-41c"/>
+                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="iCV-Dl-41c"/>
                                             </connections>
                                         </button>
                                         <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eSF-2d-z7o" userLabel="Upcoming">
@@ -72,7 +72,7 @@
                                                 <color key="titleColor" red="0.050980392159999999" green="0.1450980392" blue="0.2470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
                                             <connections>
-                                                <action selector="handleMenuSelection:" destination="-1" eventType="touchUpInside" id="eK4-im-h2E"/>
+                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="Rrk-jA-hKV"/>
                                             </connections>
                                         </button>
                                         <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MZo-uC-lwa" userLabel="TopMovies">
@@ -86,7 +86,7 @@
                                                 <color key="titleColor" red="0.050980392159999999" green="0.1450980392" blue="0.2470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
                                             <connections>
-                                                <action selector="handleMenuSelection:" destination="-1" eventType="touchUpInside" id="Lf9-5h-kTI"/>
+                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="Lf9-5h-kTI"/>
                                             </connections>
                                         </button>
                                     </subviews>

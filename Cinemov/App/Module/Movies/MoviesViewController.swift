@@ -43,6 +43,10 @@ class MoviesViewController: MoviesCollectionViewController {
         }
     }
 
+    override func xViewDidAppear() {
+        homeVC?.shouldSelectControllerByScroll = true
+    }
+
     override func setupLayout() {
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0

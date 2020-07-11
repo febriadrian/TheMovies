@@ -27,7 +27,7 @@ protocol IHomeViewController: class {
 
 class HomeViewController: UIViewController {
     @IBOutlet weak var menuView: UIView!
-    @IBOutlet weak var leadingIndicatorViewConstraint: NSLayoutConstraint!
+    @IBOutlet weak var leadingIndicatorConstraint: NSLayoutConstraint!
     @IBOutlet var menuButtons: [UIButton]!
 
     var interactor: IHomeInteractor?
@@ -44,6 +44,7 @@ class HomeViewController: UIViewController {
     var viewControllerList: [UIViewController] = []
     var previousMenu: Int = 0
     var selectedIndex: Int = 0
+    var shouldSelectControllerByScroll = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -110,38 +111,50 @@ class HomeViewController: UIViewController {
         }
     }
 
-    private func updateIndicatorViewPosition(menu: Int) {
-        let width = view.bounds.width / 4
-        DispatchQueue.main.async {
-            UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
-                self.leadingIndicatorViewConstraint.constant = (width * CGFloat(menu))
-                self.view.layoutIfNeeded()
-
-                print("leadingIndicatorViewConstraint = \(self.leadingIndicatorViewConstraint.constant)")
-            }, completion: nil)
-        }
-    }
-
-    @IBAction func handleMenuSelection(_ sender: UIButton) {
-        let viewController = viewControllerList[sender.tag]
+    private func selectViewController(withIndex index: Int) {
+        let viewController = viewControllerList[index]
         homeDelegate = viewController as? HomeDelegate
 
         pageViewController.setViewControllers(
             [viewController],
-            direction: previousMenu > sender.tag ? .reverse : .forward,
+            direction: previousMenu > index ? .reverse : .forward,
             animated: true,
             completion: nil
         )
 
-        previousMenu = sender.tag
+        previousMenu = index
+    }
 
+    private func selectMenuButtons(withTag tag: Int, completion: (() -> Void)? = nil) {
         menuButtons.forEach { button in
-            if button.tag == sender.tag {
+            if button.tag == tag {
                 button.isSelected = true
             } else {
                 button.isSelected = false
             }
-            updateIndicatorViewPosition(menu: sender.tag)
+
+            completion?()
+        }
+    }
+
+    private func updateIndicatorViewPosition(menu: Int) {
+        let width = view.bounds.width / 4
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
+                self.leadingIndicatorConstraint.constant = (width * CGFloat(menu))
+                self.view.layoutIfNeeded()
+            }) { _ in
+                // do something
+            }
+        }
+    }
+
+    @IBAction func selectControllerByMenu(_ sender: UIButton) {
+        shouldSelectControllerByScroll = selectedIndex == sender.tag ? true : false
+        selectedIndex = sender.tag
+        selectViewController(withIndex: sender.tag)
+        selectMenuButtons(withTag: sender.tag) {
+            self.updateIndicatorViewPosition(menu: sender.tag)
         }
     }
 }
@@ -171,9 +184,11 @@ extension HomeViewController: UIPageViewControllerDataSource, UIPageViewControll
         if completed {
             if let currentViewController = pageViewController.viewControllers?.first,
                 let index = viewControllerList.firstIndex(of: currentViewController) {
-                if let button = menuButtons.filter({ $0.tag == index }).first {
+                if let _ = menuButtons.filter({ $0.tag == index }).first {
                     selectedIndex = index
-                    handleMenuSelection(button)
+                    shouldSelectControllerByScroll = true
+                    selectViewController(withIndex: index)
+                    selectMenuButtons(withTag: index)
                 }
             }
         }
@@ -182,12 +197,30 @@ extension HomeViewController: UIPageViewControllerDataSource, UIPageViewControll
 
 extension HomeViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let xOffset = scrollView.contentOffset.x
-        let count = CGFloat(viewControllerList.count)
-        let width = view.bounds.width / count
-        let increment = CGFloat(selectedIndex) * width
-        let constant = ((xOffset - view.bounds.width) / count) + increment
-        leadingIndicatorViewConstraint.constant = constant
+        if shouldSelectControllerByScroll {
+            let xOffset = scrollView.contentOffset.x
+            let count = CGFloat(viewControllerList.count)
+            let fullwidth = view.bounds.width
+            let width = fullwidth / count
+            let increment = CGFloat(selectedIndex) * width
+            let constant = ((xOffset - fullwidth) / count) + increment
+
+            guard constant > 0, constant <= fullwidth - width else { return }
+
+            if xOffset > fullwidth {
+                if constant <= increment {
+                    leadingIndicatorConstraint.constant = increment
+                } else {
+                    leadingIndicatorConstraint.constant = constant
+                }
+            } else if xOffset < fullwidth {
+                if constant >= increment {
+                    leadingIndicatorConstraint.constant = increment
+                } else {
+                    leadingIndicatorConstraint.constant = constant
+                }
+            }
+        }
     }
 }
 
