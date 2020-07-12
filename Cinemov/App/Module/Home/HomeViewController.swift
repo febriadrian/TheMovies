@@ -44,18 +44,27 @@ class HomeViewController: UIViewController {
     var viewControllerList: [UIViewController] = []
     var previousMenu: Int = 0
     var selectedIndex: Int = 0
+    var screenWidth: CGFloat = 0
+    var menuCount: CGFloat = 0
+    var indicatorWidth: CGFloat = 0
     var shouldSelectControllerByScroll = true
+    var shouldSelectControllerByMenu = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.titleView = UIImageView(image: UIImage(named: "tmdblogo"))
-        mainVC = interactor?.parameters?["mainVC"] as? MainViewController
+        setupComponent()
         setupPageViewController()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         mainVC?.mainVCDelegate = self
+    }
+
+    private func setupComponent() {
+        navigationItem.titleView = UIImageView(image: UIImage(named: "tmdblogo"))
+        mainVC = interactor?.parameters?["mainVC"] as? MainViewController
+        screenWidth = UIScreen.main.bounds.width
     }
 
     private func setupPageViewController() {
@@ -80,6 +89,8 @@ class HomeViewController: UIViewController {
         ]) as? MoviesViewController
 
         viewControllerList = [popularVC, playingVC, upcomingVC, topRatedVC]
+        menuCount = CGFloat(viewControllerList.count)
+        indicatorWidth = screenWidth / menuCount
 
         pageViewController.delegate = self
         pageViewController.dataSource = self
@@ -138,23 +149,26 @@ class HomeViewController: UIViewController {
     }
 
     private func updateIndicatorViewPosition(menu: Int) {
-        let width = view.bounds.width / 4
+        let constant = indicatorWidth * CGFloat(menu)
         DispatchQueue.main.async {
             UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
-                self.leadingIndicatorConstraint.constant = (width * CGFloat(menu))
+                self.leadingIndicatorConstraint.constant = constant
                 self.view.layoutIfNeeded()
             }) { _ in
-                // do something
+                self.shouldSelectControllerByMenu = true
             }
         }
     }
 
     @IBAction func selectControllerByMenu(_ sender: UIButton) {
-        shouldSelectControllerByScroll = selectedIndex == sender.tag ? true : false
-        selectedIndex = sender.tag
-        selectViewController(withIndex: sender.tag)
-        selectMenuButtons(withTag: sender.tag) {
-            self.updateIndicatorViewPosition(menu: sender.tag)
+        if shouldSelectControllerByMenu {
+            shouldSelectControllerByMenu = false
+            shouldSelectControllerByScroll = selectedIndex == sender.tag ? true : false
+            selectedIndex = sender.tag
+            selectViewController(withIndex: sender.tag)
+            selectMenuButtons(withTag: sender.tag) {
+                self.updateIndicatorViewPosition(menu: sender.tag)
+            }
         }
     }
 }
@@ -199,27 +213,10 @@ extension HomeViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if shouldSelectControllerByScroll {
             let xOffset = scrollView.contentOffset.x
-            let count = CGFloat(viewControllerList.count)
-            let fullwidth = view.bounds.width
-            let width = fullwidth / count
-            let increment = CGFloat(selectedIndex) * width
-            let constant = ((xOffset - fullwidth) / count) + increment
-
-            guard constant > 0, constant <= fullwidth - width else { return }
-
-            if xOffset > fullwidth {
-                if constant <= increment {
-                    leadingIndicatorConstraint.constant = increment
-                } else {
-                    leadingIndicatorConstraint.constant = constant
-                }
-            } else if xOffset < fullwidth {
-                if constant >= increment {
-                    leadingIndicatorConstraint.constant = increment
-                } else {
-                    leadingIndicatorConstraint.constant = constant
-                }
-            }
+            let increment = CGFloat(selectedIndex) * indicatorWidth
+            let constant = ((xOffset - screenWidth) / menuCount) + increment
+            guard constant > 0, constant <= screenWidth - indicatorWidth else { return }
+            leadingIndicatorConstraint.constant = constant
         }
     }
 }
