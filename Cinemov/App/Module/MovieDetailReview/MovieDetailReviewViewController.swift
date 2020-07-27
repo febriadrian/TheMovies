@@ -35,6 +35,7 @@ class MovieDetailReviewViewController: UIViewController {
     }
 
     private func setupComponent() {
+        tableView.delegate = self
         tableView.registerCellType(ReviewTableViewCell.self)
 
         loadingView = LoadingView()
@@ -77,4 +78,14 @@ extension MovieDetailReviewViewController: LoadingViewDelegate {
             self.viewModel?.getReviews()
         }
     }
+}
+
+extension MovieDetailReviewViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollDelegate?.didScroll(yOffset: scrollView.contentOffset.y)
+    }
+}
+
+extension MovieDetailReviewViewController: UITableViewDelegate {
+    //
 }

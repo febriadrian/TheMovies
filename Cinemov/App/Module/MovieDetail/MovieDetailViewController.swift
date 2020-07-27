@@ -79,6 +79,7 @@ class MovieDetailViewController: UIViewController {
         similarVC.scrollDelegate = self
 
         reviewVC = MovieDetailReviewConfiguration.setup(parameters: parameter) as? MovieDetailReviewViewController
+        reviewVC.scrollDelegate = self
 
         viewControllerList = [infoVC, similarVC, reviewVC]
         menuCount = CGFloat(viewControllerList.count)
