@@ -2,11 +2,9 @@
 //  NetworkService.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 08/07/20.
-//  Copyright (c) 2020 Febri Adrian. All rights reserved.
-//  Modified VIP Templates by:  * Febri Adrian
-//                              * febriadrian.dev@gmail.com
-//                              * https://github.com/febriadrian
+//  Created by Febri Adrian on 18/07/20.
+//  Copyright © 2020 Febri Adrian. All rights reserved.
+//
 
 import Alamofire
 import Foundation
@@ -15,9 +13,14 @@ import SwiftyJSON
 typealias successHandler = (_ data: JSON?) -> Void
 typealias failureHandler = (_ error: Error?) -> Void
 
+enum TheMoviesResult<Success, Failure> {
+    case success(Success)
+    case failure(Failure)
+}
+
 protocol IEndpoint {
-    var method: HTTPMethod { get }
     var path: String { get }
+    var method: HTTPMethod { get }
     var parameter: Parameters? { get }
     var header: HTTPHeaders? { get }
     var encoding: ParameterEncoding { get }
@@ -31,7 +34,6 @@ struct NetworkStatus {
 
 class NetworkService {
     static let share = NetworkService()
-
     private var dataRequest: DataRequest?
 
     @discardableResult
@@ -52,30 +54,27 @@ class NetworkService {
         )
     }
 
-    func request<T: IEndpoint>(endpoint: T, success: (successHandler)? = nil, failure: (failureHandler)? = nil) {
-        if NetworkStatus.isInternetAvailable {
-            DispatchQueue.global(qos: .background).async {
-                self.dataRequest = self._dataRequest(url: endpoint.path,
-                                                     method: endpoint.method,
-                                                     parameters: endpoint.parameter,
-                                                     encoding: endpoint.encoding,
-                                                     headers: endpoint.header)
+    func request<T: IEndpoint>(endpoint: T, completion: ((TheMoviesResult<JSON?, Error?>) -> Void)? = nil) {
+        guard NetworkStatus.isInternetAvailable else {
+            completion?(.failure(nil))
+            return
+        }
 
-                self.dataRequest?.responseJSON(completionHandler: { response in
-                    if response.response?.statusCode != 200 {
-                        failure?(nil)
-                    } else {
-                        switch response.result {
-                        case .success(let value):
-                            success?(JSON(value))
-                        case .failure(let error):
-                            failure?(error)
-                        }
-                    }
-                })
-            }
-        } else {
-            failure?(nil)
+        DispatchQueue.global(qos: .background).async {
+            self.dataRequest = self._dataRequest(url: endpoint.path,
+                                                 method: endpoint.method,
+                                                 parameters: endpoint.parameter,
+                                                 encoding: endpoint.encoding,
+                                                 headers: endpoint.header)
+
+            self.dataRequest?.responseJSON(completionHandler: { response in
+                switch response.result {
+                case .success(let value):
+                    completion?(.success(JSON(value)))
+                case .failure(let error):
+                    completion?(.failure(error))
+                }
+            })
         }
     }
 }

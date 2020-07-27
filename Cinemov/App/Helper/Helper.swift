@@ -2,7 +2,7 @@
 //  Helper.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 08/07/20.
+//  Created by Febri Adrian on 14/07/20.
 //  Copyright © 2020 Febri Adrian. All rights reserved.
 //
 
@@ -24,15 +24,15 @@ struct Helper {
         return string ?? nil
     }
 
-    static func dateFormatter(_ dateString: String) -> String {
+    static func dateFormatter(_ dateString: String?) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        if let date = dateFormatter.date(from: dateString) {
+        if let date = dateFormatter.date(from: dateString ?? "") {
             dateFormatter.dateFormat = "MMM dd, yyyy"
             let date = dateFormatter.string(from: date)
-            return "Released on \(date)"
+            return "Release on \(date)"
         }
-        return "Released on n/a"
+        return "Release on n/a"
     }
 
     static func currencyFormatter(price: Int?) -> String {
@@ -68,7 +68,5 @@ struct Helper {
             Toast.share.show(message: message)
             completion()
         }
-
-        FavoriteDB.isUpdated = true
     }
 }

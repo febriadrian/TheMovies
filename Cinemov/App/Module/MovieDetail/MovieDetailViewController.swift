@@ -2,323 +2,292 @@
 //  MovieDetailViewController.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 10/07/20.
-//  Copyright (c) 2020 Febri Adrian. All rights reserved.
-//  Modified VIP Templates by:  * Febri Adrian
-//                              * febriadrian.dev@gmail.com
-//                              * https://github.com/febriadrian
+//  Created by Febri Adrian on 20/07/20.
+//  Copyright © 2020 Febri Adrian. All rights reserved.
+//  MVVM + RxSwift Templates by:  * Febri Adrian
+//                                * febriadrian.dev@gmail.com
+//                                * https://github.com/febriadrian
 
+import RxCocoa
+import RxSwift
 import UIKit
 
-protocol IMovieDetailViewController: class {
-    var router: IMovieDetailRouter? { get set }
-
-    func displayGetMovieDetail(detail: MovieDetailModel.MVDetailModel, cast: [MovieDetailModel.PeopleModel], crew: [MovieDetailModel.PeopleModel], similar: [MoviesModel.ViewModel], reviews: [MovieDetailModel.ReviewModel])
-    func displayGetMovieDetailFailed(message: String)
-    func displayUpdateFavorite(selfIsFavorite: Bool, similar: [MoviesModel.ViewModel])
-}
-
 class MovieDetailViewController: UIViewController {
+    @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var contentView: UIView!
-    @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var viewTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var viewHeight: NSLayoutConstraint!
+    @IBOutlet weak var menuView: UIView!
+    @IBOutlet weak var leadingIndicatorConstraint: NSLayoutConstraint!
+    @IBOutlet var menuButtons: [UIButton]!
     @IBOutlet weak var topBarsView: UIView!
     @IBOutlet weak var topBarsHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var segmentedControl: UISegmentedControl!
-    @IBOutlet weak var leadingIndicatorViewConstraint: NSLayoutConstraint!
-    @IBOutlet weak var segmenIndicator: UIView!
-    @IBOutlet weak var segmenIndicatorWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var posterTopConstraint: NSLayoutConstraint!
+    @IBOutlet weak var posterHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var menuViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet weak var headerViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet weak var favoriteButton: UIButton!
+    @IBOutlet weak var backdropImage: UIImageView!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var releaseDateLabel: UILabel!
+    @IBOutlet weak var runtimeLabel: UILabel!
+    @IBOutlet weak var posterImage: UIImageView!
 
-    var interactor: IMovieDetailInteractor?
+    var infoVC: MovieDetailInfoViewController!
+    var similarVC: MovieDetailSimilarViewController!
+    var reviewVC: MovieDetailReviewViewController!
+    var viewModel: IMovieDetailViewModel?
     var router: IMovieDetailRouter?
-    var headerView: MovieDetailHeaderView!
-    var loadingView: LoadingView!
-    var detail: MovieDetailModel.MVDetailModel?
-    var cast: [MovieDetailModel.PeopleModel]?
-    var crew: [MovieDetailModel.PeopleModel]?
-    var similar: [MoviesModel.ViewModel]?
-    var reviews: [MovieDetailModel.ReviewModel]?
-    var id: Int?
-    var isInitialLoading = true
+    private let disposeBag = DisposeBag()
+    private var loadingView: LoadingView!
 
     var topBarsHeight: CGFloat = 0
     var normalViewTopConstraint: CGFloat = 0
+    var currentYOffset: CGFloat = 0
+    private var shouldShowTopBarsView = false
+
+    let pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
+    var viewControllerList: [UIViewController] = []
+    var previousMenu: Int = 0
+    var selectedIndex: Int = 0
+    var screenWidth: CGFloat = 0
+    var menuCount: CGFloat = 0
+    var indicatorWidth: CGFloat = 0
+    var shouldSelectControllerByScroll = true
+    var shouldSelectControllerByMenu = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupSegmentedControl()
+        viewModel?.setupParameters()
+        setupPageViewController()
         setupComponent()
+        setupBinding()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if !isInitialLoading {
-            guard let detail = detail, let similar = similar, similar.count > 1 else { return }
-            interactor?.updateFavorite(selfId: detail.id, similar: similar)
+        if !shouldShowTopBarsView {
+            shouldShowTopBarsView = true
         }
     }
 
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        guard let header = tableView.tableHeaderView else { return }
-        header.frame.size.height = header.systemLayoutSizeFitting(CGSize(width: view.bounds.width, height: 0)).height
+    private func setupPageViewController() {
+        let parameter: [String: Any] = ["id": viewModel?.id ?? 0, "main": self]
+
+        infoVC = MovieDetailInfoConfiguration.setup(parameters: parameter) as? MovieDetailInfoViewController
+        infoVC.scrollDelegate = self
+
+        similarVC = MovieDetailSimilarConfiguration.setup(parameters: parameter) as? MovieDetailSimilarViewController
+        similarVC.scrollDelegate = self
+
+        reviewVC = MovieDetailReviewConfiguration.setup(parameters: parameter) as? MovieDetailReviewViewController
+
+        viewControllerList = [infoVC, similarVC, reviewVC]
+        menuCount = CGFloat(viewControllerList.count)
+        indicatorWidth = screenWidth / menuCount
+
+        pageViewController.delegate = self
+        pageViewController.dataSource = self
+        pageViewController.setViewControllers(
+            [viewControllerList[0]],
+            direction: .forward,
+            animated: true,
+            completion: nil
+        )
+
+        guard let pageView = pageViewController.view else { return }
+        pageViewController.view?.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(pageView)
+
+        NSLayoutConstraint.activate([
+            pageView.topAnchor.constraint(equalTo: menuView.bottomAnchor),
+            pageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            pageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            pageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+        ])
+
+        addChild(pageViewController)
+        pageViewController.didMove(toParent: self)
+
+        for v in pageViewController.view.subviews {
+            if v.isKind(of: UIScrollView.self) {
+                (v as! UIScrollView).delegate = self as UIScrollViewDelegate
+            }
+        }
     }
 
     private func setupComponent() {
-        id = interactor?.parameters?["id"] as? Int
+        scrollView.delegate = self
 
         extendedLayoutIncludesOpaqueBars = true
         let statusBarHeight = UIApplication.shared.statusBarFrame.height
         let navBarHeight = navigationController?.navigationBar.frame.height ?? 0
 
-        headerView = MovieDetailHeaderView()
-        headerView.favoriteButton.addTarget(self, action: #selector(didTapFavoriteButton), for: .touchUpInside)
         topBarsHeight = statusBarHeight + navBarHeight
+        scrollView.contentInset = UIEdgeInsets(top: -topBarsHeight, left: 0, bottom: 0, right: 0)
         topBarsHeightConstraint.constant = topBarsHeight
-        headerView.posterTopConstraint.constant += topBarsHeight
-        headerView.widthConstraint.constant = UIScreen.main.bounds.width
-        normalViewTopConstraint = headerView.contentHeight + topBarsHeight
-        viewTopConstraint.constant = normalViewTopConstraint
+        posterTopConstraint.constant += topBarsHeight
+        normalViewTopConstraint = posterHeightConstraint.constant + posterTopConstraint.constant + 12
+        menuViewTopConstraint.constant = normalViewTopConstraint
 
-        tableView.registerCellType(MovieTableViewCell.self)
-        tableView.delegate = self
-        tableView.dataSource = self
-
-        let contentView = headerView.contentView
-        tableView.contentInset = UIEdgeInsets(top: -topBarsHeight, left: 0, bottom: 0, right: 0)
-        tableView.tableHeaderView = contentView
-        tableView.tableHeaderView?.backgroundColor = .red
-        tableView.sectionHeaderHeight = UITableView.automaticDimension
-        tableView.estimatedSectionHeaderHeight = 40
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.registerCellType(MovieDetailInfoTableViewCell.self)
-        tableView.registerCellType(MovieTableViewCell.self)
-        tableView.registerCellType(ReviewTableViewCell.self)
-        tableView.registerCellType(NoDetailTableViewCell.self)
+        screenWidth = UIScreen.main.bounds.width
+        indicatorWidth = screenWidth / CGFloat(menuButtons.count)
 
         loadingView = LoadingView()
-        loadingView.handleReload = { [weak self] in
-            self?.didTapReloadButton()
-        }
-
-        loadingView.setup(in: self.contentView) {
-            self.getMovieDetail()
-        }
-    }
-
-    private func setupSegmentedControl() {
-        segmentedControl.selectedSegmentIndex = 0
-        segmentedControl.backgroundColor = Colors.darkBlue
-        if #available(iOS 13.0, *) {
-            segmentedControl.selectedSegmentTintColor = .clear
-        } else {
-            segmentedControl.tintColor = .clear
-        }
-        segmentedControl.setTitleTextAttributes([
-            NSAttributedString.Key.foregroundColor: UIColor.lightGray,
-            NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)
-        ], for: .normal)
-        segmentedControl.setTitleTextAttributes([
-            NSAttributedString.Key.foregroundColor: Colors.lightBlue,
-            NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15)
-        ], for: .selected)
-
-        segmenIndicator.backgroundColor = Colors.lightBlue
-        segmenIndicatorWidthConstraint.constant = UIScreen.main.bounds.width / CGFloat(segmentedControl.numberOfSegments)
-    }
-
-    private func getMovieDetail() {
-        guard let id = id else { return }
-        interactor?.getMovieDetail(id: id)
-    }
-
-    @objc private func didTapReloadButton() {
+        loadingView.delegate = self
+        loadingView.setup(in: contentView)
         loadingView.start {
-            self.getMovieDetail()
+            self.viewModel?.getMovieDetail()
         }
+
+        favoriteButton.addTarget(self, action: #selector(didTapFavoriteButton), for: .touchUpInside)
     }
 
-    @IBAction func handleSegmentChange(_ sender: UISegmentedControl) {
-        tableView.reloadData()
+    private func setupBinding() {
+        viewModel?.result
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { result in
+                switch result {
+                case .success:
+                    self.loadingView.stop()
+                case .failure(let message):
+                    self.loadingView.stop(isFailed: true, message: message)
+                }
+            })
+            .disposed(by: disposeBag)
 
-        let width = segmenIndicatorWidthConstraint.constant
-        let menu = segmentedControl.selectedSegmentIndex
-        DispatchQueue.main.async {
-            UIView.animate(withDuration: 0.3) {
-                UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
-                    self.leadingIndicatorViewConstraint.constant = (width * CGFloat(menu))
-                    self.view.layoutIfNeeded()
-                }, completion: nil)
-            }
-        }
+        viewModel?.favorite
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { isFavorite in
+                self.favoriteButton.isSelected = isFavorite
+            })
+            .disposed(by: disposeBag)
 
-        if segmentedControl.selectedSegmentIndex == 0 ||
-            segmentedControl.selectedSegmentIndex == 1 && similar?.count == 0 ||
-            segmentedControl.selectedSegmentIndex == 2 && reviews?.count == 0 {
-            tableView.allowsSelection = false
-        } else {
-            tableView.allowsSelection = true
-        }
+        viewModel?.detail
+            .bind(onNext: { detail in
+                self.favoriteButton.isSelected = detail.favorite
+                self.posterImage.setImage(with: detail.posterPath)
+                self.backdropImage.setImage(with: detail.backdropPath)
+                self.titleLabel.text = detail.title
+                self.releaseDateLabel.text = detail.releaseDate
+                self.runtimeLabel.text = detail.runtime
+            })
+            .disposed(by: disposeBag)
+
+        viewModel?.detail
+            .observeOn(MainScheduler.instance)
+            .bind(to: infoVC.detail)
+            .disposed(by: disposeBag)
+
+        viewModel?.cast
+            .observeOn(MainScheduler.instance)
+            .bind(to: infoVC.cast)
+            .disposed(by: disposeBag)
+
+        viewModel?.crew
+            .observeOn(MainScheduler.instance)
+            .bind(to: infoVC.crew)
+            .disposed(by: disposeBag)
     }
 
     @objc private func didTapFavoriteButton() {
-        guard let detail = detail else { return }
-        let movie = MoviesModel.ViewModel(
-            id: detail.id,
-            title: detail.title,
-            posterUrl: detail.posterPath,
-            voteAverage: detail.voteAverage,
-            overview: detail.overview,
-            releaseDate: detail.releaseDate,
-            favorite: detail.favorite,
-            createdAt: 0
+        viewModel?.updateFavorite()
+    }
+
+    private func selectViewController(withIndex index: Int) {
+        pageViewController.setViewControllers(
+            [viewControllerList[index]],
+            direction: previousMenu > index ? .reverse : .forward,
+            animated: true,
+            completion: nil
         )
 
-        Helper.updateFavorite(movie: movie, favorite: detail.favorite) {
-            self.detail?.favorite = !detail.favorite
-            self.headerView.favoriteButton.isSelected = !detail.favorite
+        previousMenu = index
+    }
+
+    private func selectMenuButtons(withTag tag: Int, completion: (() -> Void)? = nil) {
+        menuButtons.forEach { button in
+            if button.tag == tag {
+                button.isSelected = true
+            } else {
+                button.isSelected = false
+            }
+
+            completion?()
+        }
+    }
+
+    private func updateIndicatorViewPosition(menu: Int) {
+        let constant = indicatorWidth * CGFloat(menu)
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
+                self.leadingIndicatorConstraint.constant = constant
+                self.view.layoutIfNeeded()
+            }) { _ in
+                self.shouldSelectControllerByMenu = true
+            }
+        }
+    }
+
+    @IBAction func selectControllerByMenu(_ sender: UIButton) {
+        if shouldSelectControllerByMenu {
+            shouldSelectControllerByMenu = false
+            shouldSelectControllerByScroll = selectedIndex == sender.tag ? true : false
+            selectedIndex = sender.tag
+            selectViewController(withIndex: sender.tag)
+            selectMenuButtons(withTag: sender.tag) {
+                self.updateIndicatorViewPosition(menu: sender.tag)
+            }
         }
     }
 }
 
-extension MovieDetailViewController: IMovieDetailViewController {
-    func displayGetMovieDetail(detail: MovieDetailModel.MVDetailModel, cast: [MovieDetailModel.PeopleModel], crew: [MovieDetailModel.PeopleModel], similar: [MoviesModel.ViewModel], reviews: [MovieDetailModel.ReviewModel]) {
-        self.detail = detail
-        self.cast = cast
-        self.crew = crew
-        self.similar = similar
-        self.reviews = reviews
-
-        headerView.favoriteButton.isSelected = detail.favorite
-        headerView.posterImage.setImage(with: detail.posterPath)
-        headerView.backdropImage.setImage(with: detail.backdropPath)
-        headerView.titleLabel.text = detail.title
-        headerView.releaseDateLabel.text = detail.releaseDate
-        headerView.runtimeLabel.text = detail.runtime
-        tableView.reloadData()
-
-        isInitialLoading = false
-        loadingView.stop(isSuccess: true)
-    }
-
-    func displayGetMovieDetailFailed(message: String) {
-        isInitialLoading = false
-        loadingView.stop(isSuccess: false, message: message)
-    }
-
-    func displayUpdateFavorite(selfIsFavorite: Bool, similar: [MoviesModel.ViewModel]) {
-        self.similar = similar
-        detail?.favorite = selfIsFavorite
-        headerView.favoriteButton.isSelected = selfIsFavorite
-        tableView.performBatchUpdates({
-            self.tableView.reloadData()
-        })
-    }
-}
-
-extension MovieDetailViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch segmentedControl.selectedSegmentIndex {
-        case 0:
-            return 1
-        case 1:
-            if let count = similar?.count, count > 0 {
-                return count
-            }
-            return 1
-        default:
-            if let count = reviews?.count, count > 0 {
-                return count
-            }
-            return 1
-        }
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch segmentedControl.selectedSegmentIndex {
-        case 0:
-            let cell = tableView.dequeueReusableCell(MovieDetailInfoTableViewCell.self, for: indexPath)
-            cell.detail = detail
-            cell.cast = cast
-            cell.crew = crew
-            cell.handleUpdateCell = { [weak self] in
-                self?.tableView.beginUpdates()
-                self?.tableView.endUpdates()
-            }
-            return cell
-        case 1:
-            if similar?.count == 0 {
-                let cell = tableView.dequeueReusableCell(NoDetailTableViewCell.self, for: indexPath)
-                cell.messageLabel.text = "No similar movies found.."
-                return cell
-            }
-
-            let cell = tableView.dequeueReusableCell(MovieTableViewCell.self, for: indexPath)
-            cell.movies = similar?[indexPath.row]
-            cell.handleFavorite = { [weak self] favorite in
-                guard let movie = self?.similar?[indexPath.row] else { return }
-                Helper.updateFavorite(movie: movie, favorite: favorite) {
-                    tableView.performBatchUpdates({
-                        self?.similar?[indexPath.row].favorite = !favorite
-                        cell.movies = self?.similar?[indexPath.row]
-                    })
-                }
-            }
-            return cell
-        default:
-            if reviews?.count == 0 {
-                let cell = tableView.dequeueReusableCell(NoDetailTableViewCell.self, for: indexPath)
-                cell.messageLabel.text = "No reviews found.."
-                return cell
-            }
-
-            let cell = tableView.dequeueReusableCell(ReviewTableViewCell.self, for: indexPath)
-            cell.review = reviews?[indexPath.row]
-            cell.handleUpdateCell = { [weak self] in
-                self?.tableView.beginUpdates()
-                self?.tableView.endUpdates()
-            }
-            return cell
-        }
-    }
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch segmentedControl.selectedSegmentIndex {
-        case 1:
-            guard let id = similar?[indexPath.row].id else { return }
-            router?.navToMovieDetail(id: id)
-        default:
-            break
+extension MovieDetailViewController: LoadingViewDelegate {
+    func didTapReloadButton() {
+        loadingView.start {
+            self.viewModel?.getMovieDetail()
         }
     }
 }
 
 extension MovieDetailViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let yOffset = scrollView.contentOffset.y
-        let constant = normalViewTopConstraint - yOffset
+        if shouldSelectControllerByScroll {
+            let xOffset = scrollView.contentOffset.x
+            let increment = CGFloat(selectedIndex) * indicatorWidth
+            let constant = ((xOffset - screenWidth) / menuCount) + increment
+            guard constant > 0, constant <= screenWidth - indicatorWidth else { return }
+            leadingIndicatorConstraint.constant = constant
+        }
+    }
+}
+
+extension MovieDetailViewController: MovieDetailScrollDelegate {
+    func didScroll(yOffset: CGFloat) {
+        currentYOffset = yOffset
+
+        let constant = normalViewTopConstraint - currentYOffset
 
         if yOffset > 0 {
             if constant <= topBarsHeight {
                 showTopBarsView()
-                viewTopConstraint.constant = topBarsHeight
+                headerViewTopConstraint.constant = -currentYOffset
+                menuViewTopConstraint.constant = topBarsHeight
             } else if constant > topBarsHeight {
                 hideTopBarsView()
-                viewTopConstraint.constant = constant
+                headerViewTopConstraint.constant = -currentYOffset
+                menuViewTopConstraint.constant = constant
             }
         } else {
             hideTopBarsView()
-            viewTopConstraint.constant = constant
+            headerViewTopConstraint.constant = -currentYOffset
+            menuViewTopConstraint.constant = constant
         }
     }
 
     private func showTopBarsView() {
-        guard topBarsView.alpha == 0 else { return }
+        guard topBarsView.alpha == 0, shouldShowTopBarsView else { return }
         DispatchQueue.main.async {
             UIView.animate(withDuration: 0.3) {
-                self.title = self.detail?.title
+                self.title = self.viewModel?.movieTitle
                 self.topBarsView.alpha = 1
             }
         }
@@ -330,6 +299,42 @@ extension MovieDetailViewController: UIScrollViewDelegate {
             UIView.animate(withDuration: 0.3) {
                 self.title = nil
                 self.topBarsView.alpha = 0
+            }
+        }
+    }
+}
+
+extension MovieDetailViewController: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+    func presentationCount(for pageViewController: UIPageViewController) -> Int {
+        return viewControllerList.count
+    }
+
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        guard let vcIndex = viewControllerList.firstIndex(of: viewController) else { return nil }
+        let previousIndex = vcIndex - 1
+        guard previousIndex >= 0 else { return nil }
+        guard viewControllerList.count > previousIndex else { return nil }
+        return viewControllerList[previousIndex]
+    }
+
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        guard let vcIndex = viewControllerList.firstIndex(of: viewController) else { return nil }
+        let nextIndex = vcIndex + 1
+        guard viewControllerList.count != nextIndex else { return nil }
+        guard viewControllerList.count > nextIndex else { return nil }
+        return viewControllerList[nextIndex]
+    }
+
+    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        if completed {
+            if let currentViewController = pageViewController.viewControllers?.first,
+                let index = viewControllerList.firstIndex(of: currentViewController) {
+                if let _ = menuButtons.filter({ $0.tag == index }).first {
+                    selectedIndex = index
+                    shouldSelectControllerByScroll = true
+                    selectViewController(withIndex: index)
+                    selectMenuButtons(withTag: index)
+                }
             }
         }
     }

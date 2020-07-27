@@ -11,6 +11,8 @@ target 'Cinemov' do
   pod 'SwiftyJSON'
   pod 'RealmSwift'
   pod 'Kingfisher', '~> 5.14'
+  pod 'RxSwift', '~> 5'
+  pod 'RxCocoa', '~> 5'
 
   target 'CinemovTests' do
     inherit! :search_paths

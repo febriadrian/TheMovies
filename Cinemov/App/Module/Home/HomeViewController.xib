@@ -10,13 +10,13 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="HomeViewController" customModule="Cinemov" customModuleProvider="target">
             <connections>
-                <outlet property="leadingIndicatorConstraint" destination="e1M-tg-vYS" id="qvq-7m-rWI"/>
-                <outlet property="menuView" destination="c1X-rO-mP3" id="Nqj-S0-yGk"/>
+                <outlet property="leadingIndicatorConstraint" destination="z73-At-geR" id="Xmh-92-rgl"/>
+                <outlet property="menuView" destination="Kof-Eh-iMu" id="Zvv-WU-mBa"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
-                <outletCollection property="menuButtons" destination="dzh-QN-vlx" collectionClass="NSMutableArray" id="Xs3-qM-EQK"/>
-                <outletCollection property="menuButtons" destination="bDO-0z-HZj" collectionClass="NSMutableArray" id="ffz-7K-tzS"/>
-                <outletCollection property="menuButtons" destination="eSF-2d-z7o" collectionClass="NSMutableArray" id="Kl7-ez-V9f"/>
-                <outletCollection property="menuButtons" destination="MZo-uC-lwa" collectionClass="NSMutableArray" id="Phd-44-Cca"/>
+                <outletCollection property="menuButtons" destination="6aR-UH-tbE" collectionClass="NSMutableArray" id="2N2-yb-PaP"/>
+                <outletCollection property="menuButtons" destination="hdX-FH-vAf" collectionClass="NSMutableArray" id="ZyM-SI-zRE"/>
+                <outletCollection property="menuButtons" destination="5uN-Uz-qz4" collectionClass="NSMutableArray" id="NKN-ew-rsP"/>
+                <outletCollection property="menuButtons" destination="qmO-F1-3op" collectionClass="NSMutableArray" id="YH9-Lw-xhv"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -24,16 +24,16 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6zi-fi-lic" userLabel="ContentView">
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JMc-Ow-7QM" userLabel="ContentView">
                     <rect key="frame" x="0.0" y="44" width="414" height="818"/>
                     <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="c1X-rO-mP3">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Kof-Eh-iMu">
                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
                             <subviews>
-                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="Q1V-xs-T6O">
+                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="Sht-YA-LhF">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="39.5"/>
                                     <subviews>
-                                        <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dzh-QN-vlx" userLabel="Popular">
+                                        <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6aR-UH-tbE" userLabel="Popular">
                                             <rect key="frame" x="0.0" y="0.0" width="103.5" height="39.5"/>
                                             <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
                                             <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -44,10 +44,10 @@
                                                 <color key="titleColor" red="0.050980392159999999" green="0.1450980392" blue="0.2470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
                                             <connections>
-                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="gIW-6S-vK0"/>
+                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="gr4-2r-C0P"/>
                                             </connections>
                                         </button>
-                                        <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bDO-0z-HZj" userLabel="Playing">
+                                        <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hdX-FH-vAf" userLabel="Playing">
                                             <rect key="frame" x="103.5" y="0.0" width="103.5" height="39.5"/>
                                             <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
                                             <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -58,10 +58,10 @@
                                                 <color key="titleColor" red="0.050980392159999999" green="0.1450980392" blue="0.2470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
                                             <connections>
-                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="iCV-Dl-41c"/>
+                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="Iew-me-1le"/>
                                             </connections>
                                         </button>
-                                        <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eSF-2d-z7o" userLabel="Upcoming">
+                                        <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5uN-Uz-qz4" userLabel="Upcoming">
                                             <rect key="frame" x="207" y="0.0" width="103.5" height="39.5"/>
                                             <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
                                             <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -72,10 +72,10 @@
                                                 <color key="titleColor" red="0.050980392159999999" green="0.1450980392" blue="0.2470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
                                             <connections>
-                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="Rrk-jA-hKV"/>
+                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="K4J-Az-ob7"/>
                                             </connections>
                                         </button>
-                                        <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MZo-uC-lwa" userLabel="TopMovies">
+                                        <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qmO-F1-3op" userLabel="TopMovies">
                                             <rect key="frame" x="310.5" y="0.0" width="103.5" height="39.5"/>
                                             <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
                                             <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -86,59 +86,59 @@
                                                 <color key="titleColor" red="0.050980392159999999" green="0.1450980392" blue="0.2470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
                                             <connections>
-                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="Lf9-5h-kTI"/>
+                                                <action selector="selectControllerByMenu:" destination="-1" eventType="touchUpInside" id="P06-Xn-3vG"/>
                                             </connections>
                                         </button>
                                     </subviews>
                                 </stackView>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Y53-Ws-5Tm" userLabel="IndicatorView">
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rdm-LY-CSA" userLabel="IndicatorView">
                                     <rect key="frame" x="0.0" y="38" width="103.5" height="2"/>
                                     <color key="backgroundColor" red="0.0039215686269999999" green="0.70588235290000001" blue="0.89411764709999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <constraints>
-                                        <constraint firstAttribute="height" constant="2" id="fJB-tQ-gcf"/>
+                                        <constraint firstAttribute="height" constant="2" id="vc1-Yu-dG5"/>
                                     </constraints>
                                 </view>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qb4-0i-ibA">
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2wS-UY-trI">
                                     <rect key="frame" x="0.0" y="39.5" width="414" height="0.5"/>
                                     <color key="backgroundColor" systemColor="opaqueSeparatorColor" red="0.77647058820000003" green="0.77647058820000003" blue="0.7843137255" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <constraints>
-                                        <constraint firstAttribute="height" constant="0.5" id="TRB-Gp-opo"/>
+                                        <constraint firstAttribute="height" constant="0.5" id="HiP-67-t0a"/>
                                     </constraints>
                                 </view>
                             </subviews>
                             <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                             <constraints>
-                                <constraint firstItem="Q1V-xs-T6O" firstAttribute="leading" secondItem="c1X-rO-mP3" secondAttribute="leading" id="IeW-mT-w1H"/>
-                                <constraint firstItem="qb4-0i-ibA" firstAttribute="leading" secondItem="c1X-rO-mP3" secondAttribute="leading" id="Lg1-EO-E20"/>
-                                <constraint firstItem="Q1V-xs-T6O" firstAttribute="top" secondItem="c1X-rO-mP3" secondAttribute="top" id="Zkf-YZ-88r"/>
-                                <constraint firstItem="Y53-Ws-5Tm" firstAttribute="leading" secondItem="c1X-rO-mP3" secondAttribute="leading" id="e1M-tg-vYS"/>
-                                <constraint firstItem="Y53-Ws-5Tm" firstAttribute="width" secondItem="c1X-rO-mP3" secondAttribute="width" multiplier="0.25" id="jNH-vh-6FB"/>
-                                <constraint firstItem="qb4-0i-ibA" firstAttribute="top" secondItem="Q1V-xs-T6O" secondAttribute="bottom" id="qce-oa-bWe"/>
-                                <constraint firstAttribute="height" constant="40" id="ruI-1a-9jw"/>
-                                <constraint firstAttribute="trailing" secondItem="Q1V-xs-T6O" secondAttribute="trailing" id="twf-eK-9gc"/>
-                                <constraint firstAttribute="bottom" secondItem="Y53-Ws-5Tm" secondAttribute="bottom" id="unn-3d-6ik"/>
-                                <constraint firstAttribute="trailing" secondItem="qb4-0i-ibA" secondAttribute="trailing" id="wp0-E3-AXt"/>
-                                <constraint firstAttribute="bottom" secondItem="qb4-0i-ibA" secondAttribute="bottom" id="wrc-yV-2r5"/>
+                                <constraint firstAttribute="height" constant="40" id="2fa-XU-XTq"/>
+                                <constraint firstAttribute="trailing" secondItem="2wS-UY-trI" secondAttribute="trailing" id="Ccg-WK-Oxu"/>
+                                <constraint firstItem="2wS-UY-trI" firstAttribute="top" secondItem="Sht-YA-LhF" secondAttribute="bottom" id="DYo-qz-tR8"/>
+                                <constraint firstItem="Sht-YA-LhF" firstAttribute="top" secondItem="Kof-Eh-iMu" secondAttribute="top" id="GKg-PO-xKJ"/>
+                                <constraint firstItem="2wS-UY-trI" firstAttribute="leading" secondItem="Kof-Eh-iMu" secondAttribute="leading" id="KZr-Lz-NhB"/>
+                                <constraint firstAttribute="bottom" secondItem="2wS-UY-trI" secondAttribute="bottom" id="Ndu-Pi-xAJ"/>
+                                <constraint firstAttribute="bottom" secondItem="Rdm-LY-CSA" secondAttribute="bottom" id="YD2-Kk-MbR"/>
+                                <constraint firstAttribute="trailing" secondItem="Sht-YA-LhF" secondAttribute="trailing" id="cVh-b4-vkp"/>
+                                <constraint firstItem="Sht-YA-LhF" firstAttribute="leading" secondItem="Kof-Eh-iMu" secondAttribute="leading" id="rIT-TI-feg"/>
+                                <constraint firstItem="Rdm-LY-CSA" firstAttribute="leading" secondItem="Kof-Eh-iMu" secondAttribute="leading" id="z73-At-geR"/>
+                                <constraint firstItem="Rdm-LY-CSA" firstAttribute="width" secondItem="Kof-Eh-iMu" secondAttribute="width" multiplier="0.25" id="zAd-zx-aEc"/>
                             </constraints>
                         </view>
                     </subviews>
                     <color key="backgroundColor" red="0.95686274510000002" green="0.95686274510000002" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
-                        <constraint firstItem="c1X-rO-mP3" firstAttribute="leading" secondItem="6zi-fi-lic" secondAttribute="leading" id="CMV-7m-AxW"/>
-                        <constraint firstItem="c1X-rO-mP3" firstAttribute="top" secondItem="6zi-fi-lic" secondAttribute="top" id="MBy-hL-ixp"/>
-                        <constraint firstAttribute="trailing" secondItem="c1X-rO-mP3" secondAttribute="trailing" id="R2L-0q-eZI"/>
+                        <constraint firstItem="Kof-Eh-iMu" firstAttribute="top" secondItem="JMc-Ow-7QM" secondAttribute="top" id="Kho-Je-hJH"/>
+                        <constraint firstAttribute="trailing" secondItem="Kof-Eh-iMu" secondAttribute="trailing" id="dbw-m2-E4N"/>
+                        <constraint firstItem="Kof-Eh-iMu" firstAttribute="leading" secondItem="JMc-Ow-7QM" secondAttribute="leading" id="h0b-uT-U8C"/>
                     </constraints>
                 </view>
             </subviews>
-            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
             <constraints>
-                <constraint firstItem="6zi-fi-lic" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="bEE-ur-0UC"/>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="6zi-fi-lic" secondAttribute="trailing" id="dxU-jL-BdL"/>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="6zi-fi-lic" secondAttribute="bottom" id="esU-hW-yUM"/>
-                <constraint firstItem="6zi-fi-lic" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="hHS-uz-Y5s"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="JMc-Ow-7QM" secondAttribute="trailing" id="0xD-Iw-66b"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="leading" secondItem="JMc-Ow-7QM" secondAttribute="leading" id="8lz-3A-tKM"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="top" secondItem="JMc-Ow-7QM" secondAttribute="top" id="kKl-iB-Z5D"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="JMc-Ow-7QM" secondAttribute="bottom" id="uAu-W6-jeD"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
-            <point key="canvasLocation" x="137.68115942028987" y="129.91071428571428"/>
+            <point key="canvasLocation" x="139" y="110"/>
         </view>
     </objects>
 </document>

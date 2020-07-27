@@ -2,15 +2,14 @@
 //  CinemovTests.swift
 //  CinemovTests
 //
-//  Created by Febri Adrian on 08/07/20.
+//  Created by Febri Adrian on 14/07/20.
 //  Copyright © 2020 Febri Adrian. All rights reserved.
 //
 
-import XCTest
 @testable import Cinemov
+import XCTest
 
 class CinemovTests: XCTestCase {
-
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -30,5 +29,4 @@ class CinemovTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
-
 }

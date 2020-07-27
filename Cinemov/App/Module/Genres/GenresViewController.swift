@@ -2,83 +2,97 @@
 //  GenresViewController.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 09/07/20.
-//  Copyright (c) 2020 Febri Adrian. All rights reserved.
-//  Modified VIP Templates by:  * Febri Adrian
-//                              * febriadrian.dev@gmail.com
-//                              * https://github.com/febriadrian
+//  Created by Febri Adrian on 20/07/20.
+//  Copyright © 2020 Febri Adrian. All rights reserved.
+//  MVVM + RxSwift Templates by:  * Febri Adrian
+//                                * febriadrian.dev@gmail.com
+//                                * https://github.com/febriadrian
 
+import RxCocoa
+import RxSwift
 import UIKit
 
 protocol GenresDelegate {
     func didSelectGenres(genreIds: [String]?, selectedIndex: [IndexPath]?)
 }
 
-protocol IGenresViewController: class {
-    var router: IGenresRouter? { get set }
-    
-    func displayGetGenres(genres: [GenresModel.Response.Genres])
-    func displayGetGenresFailed(message: String)
-}
-
 class GenresViewController: UIViewController {
     @IBOutlet weak var contentView: UIView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var doneButton: UIButton!
-    
-    var interactor: IGenresInteractor?
+
+    var viewModel: IGenresViewModel?
     var router: IGenresRouter?
     var delegate: GenresDelegate?
-    
-    var loadingView: LoadingView!
-    var genres = [GenresModel.Response.Genres]()
-    var selectedGenres = [String]()
-    var selectedIndex: [IndexPath]?
-    
+    private var loadingView: LoadingView!
+    private let disposeBag = DisposeBag()
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        viewModel?.setupParameters()
         setupComponent()
+        setupBinding()
     }
-    
+
     private func setupComponent() {
         title = "Genres"
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(didTapCancelButton))
-        
-        selectedIndex = interactor?.parameters?["index"] as? [IndexPath]
-        
-        tableView.registerCellType(GenresTableViewCell.self)
+
         tableView.allowsMultipleSelection = true
-        
-        if let genres = GenresCache.share.get()?.data {
-            self.genres = genres
-            tableView.reloadData()
-            setupCurrentSelectedGenres()
-        } else {
-            loadingView = LoadingView()
-            loadingView.handleReload = { [weak self] in
-                self?.didTapReloadButton()
-            }
-            
-            loadingView.setup(in: contentView) {
-                self.interactor?.getGenres()
+        tableView.registerCellType(GenresTableViewCell.self)
+
+        loadingView = LoadingView()
+        loadingView.delegate = self
+        loadingView.setup(in: contentView) {
+            self.loadingView.start {
+                self.viewModel?.getGenres()
             }
         }
     }
-    
-    private func setupCurrentSelectedGenres() {
-        guard let indexPaths = selectedIndex else { return }
-        
-        selectedIndex?.removeAll()
-        
-        for indexPath in indexPaths {
-            _ = tableView.delegate?.tableView?(tableView, willSelectRowAt: indexPath)
-            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
-            tableView.delegate?.tableView?(tableView, didSelectRowAt: indexPath)
-        }
+
+    private func setupBinding() {
+        viewModel?.result
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { result in
+                switch result {
+                case .success:
+                    self.loadingView.stop()
+                    DispatchQueue.main.async {
+                        self.setupCurrentSelectedGenres()
+                    }
+                case .failure(let message):
+                    self.loadingView.stop(isFailed: true, message: message)
+                }
+            })
+            .disposed(by: disposeBag)
+
+        viewModel?.genres
+            .bind(to: tableView.rx.items(cellIdentifier: "GenresTableViewCell", cellType: GenresTableViewCell.self)) { _, genre, cell in
+                cell.setupView(genre: genre)
+            }
+            .disposed(by: disposeBag)
+
+        tableView.rx
+            .itemSelected
+            .subscribe(onNext: { indexPath in
+                self.viewModel?.didSelectGenreId(at: indexPath.row)
+                self.viewModel?.selectedIndex = self.tableView.indexPathsForSelectedRows
+                self.setupRightBarButton()
+            })
+            .disposed(by: disposeBag)
+
+        tableView.rx
+            .itemDeselected
+            .subscribe(onNext: { indexPath in
+                self.viewModel?.didDeselectGenreId(at: indexPath.row)
+                self.viewModel?.selectedIndex = self.tableView.indexPathsForSelectedRows
+                self.setupRightBarButton()
+            })
+            .disposed(by: disposeBag)
     }
-    
+
     private func setupRightBarButton() {
-        if selectedGenres.count == 0 {
+        if viewModel?.selectedCount == 0 {
             navigationItem.rightBarButtonItem = nil
             doneButton.isHidden = true
         } else {
@@ -86,91 +100,43 @@ class GenresViewController: UIViewController {
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Reset", style: .plain, target: self, action: #selector(didTapResetButton))
         }
     }
-    
-    @objc private func didTapCancelButton() {
-        dismiss()
+
+    private func setupCurrentSelectedGenres() {
+        guard let indexPaths = viewModel?.selectedIndex else { return }
+        viewModel?.selectedIndex?.removeAll()
+        for indexPath in indexPaths {
+            _ = tableView.delegate?.tableView?(tableView, willSelectRowAt: indexPath)
+            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+            tableView.delegate?.tableView?(tableView, didSelectRowAt: indexPath)
+        }
     }
-    
+
     @objc private func didTapResetButton() {
-        for row in 0..<tableView.numberOfRows(inSection: 0) {
-            let indexPath = IndexPath(row: row, section: 0)
+        guard let indexPaths = viewModel?.selectedIndex else { return }
+        for indexPath in indexPaths {
             _ = tableView.delegate?.tableView?(tableView, willDeselectRowAt: indexPath)
             tableView.deselectRow(at: indexPath, animated: false)
             tableView.delegate?.tableView?(tableView, didDeselectRowAt: indexPath)
         }
-        
-        selectedIndex = nil
+
         delegate?.didSelectGenres(genreIds: nil, selectedIndex: nil)
         dismiss()
     }
-    
-    @objc private func didTapReloadButton() {
-        loadingView.start {
-            self.interactor?.getGenres()
-        }
+
+    @objc private func didTapCancelButton() {
+        dismiss()
     }
-    
+
     @IBAction func didTapDoneButton(_ sender: UIButton) {
-        delegate?.didSelectGenres(genreIds: selectedGenres, selectedIndex: selectedIndex)
+        delegate?.didSelectGenres(genreIds: viewModel?.genresIds, selectedIndex: viewModel?.selectedIndex)
         dismiss()
     }
 }
 
-extension GenresViewController: IGenresViewController {
-    func displayGetGenres(genres: [GenresModel.Response.Genres]) {
-        if genres.count == 0 {
-            let message = "Something went wrong.."
-            loadingView.stop(isSuccess: false, message: message)
-        } else {
-            loadingView.stop(isSuccess: true) {
-                self.genres = genres
-                self.tableView.reloadData()
-                self.setupCurrentSelectedGenres()
-            }
+extension GenresViewController: LoadingViewDelegate {
+    func didTapReloadButton() {
+        loadingView.start {
+            self.viewModel?.getGenres()
         }
-    }
-    
-    func displayGetGenresFailed(message: String) {
-        loadingView.stop(isSuccess: false, message: message)
-    }
-}
-
-extension GenresViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return genres.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(GenresTableViewCell.self, for: indexPath)
-        cell.genres = genres[indexPath.row]
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let id = genres[indexPath.row].id else { return }
-        let stringId = "\(id)"
-        
-        if selectedIndex == nil {
-            selectedIndex = [IndexPath]()
-        }
-        
-        selectedGenres.append(stringId)
-        selectedIndex?.append(indexPath)
-        setupRightBarButton()
-    }
-    
-    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        guard let id = genres[indexPath.row].id else { return }
-        let stringId = "\(id)"
-        
-        if let index = selectedGenres.firstIndex(of: stringId) {
-            selectedGenres.remove(at: index)
-        }
-        
-        if let index = selectedIndex?.firstIndex(of: indexPath) {
-            selectedIndex?.remove(at: index)
-        }
-        
-        setupRightBarButton()
     }
 }

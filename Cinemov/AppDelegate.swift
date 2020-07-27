@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 08/07/20.
+//  Created by Febri Adrian on 14/07/20.
 //  Copyright © 2020 Febri Adrian. All rights reserved.
 //
 
@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        window?.setRootViewController(MainConfiguration.setup(), options: UIWindow.TransitionOptions(direction: .fade, style: .easeInOut))
+        window?.setRootViewController(MainViewController(), options: .init(direction: .fade, style: .easeInOut))
 
         let navBar = UINavigationBar.appearance()
         navBar.tintColor = Colors.lightBlue

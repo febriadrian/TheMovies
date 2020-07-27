@@ -2,26 +2,26 @@
 //  HomeConfiguration.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 08/07/20.
-//  Copyright (c) 2020 Febri Adrian. All rights reserved.
-//  Modified VIP Templates by:  * Febri Adrian
-//                              * febriadrian.dev@gmail.com
-//                              * https://github.com/febriadrian
+//  Created by Febri Adrian on 21/07/20.
+//  Copyright © 2020 Febri Adrian. All rights reserved.
+//  MVVM + RxSwift Templates by:  * Febri Adrian
+//                                * febriadrian.dev@gmail.com
+//                                * https://github.com/febriadrian
 
 import Foundation
 import UIKit
 
-class HomeConfiguration {
+struct HomeConfiguration {
     static func setup(parameters: [String: Any] = [:]) -> UIViewController {
         let controller = HomeViewController()
         let router = HomeRouter(view: controller)
-        let presenter = HomePresenter(view: controller)
+        let viewModel = HomeViewModel()
         let manager = HomeManager()
-        let interactor = HomeInteractor(presenter: presenter, manager: manager)
 
-        controller.interactor = interactor
+        viewModel.parameters = parameters
+        viewModel.manager = manager
+        controller.viewModel = viewModel
         controller.router = router
-        interactor.parameters = parameters
         return controller
     }
 }

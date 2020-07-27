@@ -2,16 +2,16 @@
 //  MovieDetailRouter.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 10/07/20.
-//  Copyright (c) 2020 Febri Adrian. All rights reserved.
-//  Modified VIP Templates by:  * Febri Adrian
-//                              * febriadrian.dev@gmail.com
-//                              * https://github.com/febriadrian
+//  Created by Febri Adrian on 20/07/20.
+//  Copyright © 2020 Febri Adrian. All rights reserved.
+//  MVVM + RxSwift Templates by:  * Febri Adrian
+//                                * febriadrian.dev@gmail.com
+//                                * https://github.com/febriadrian
 
 import UIKit
 
 protocol IMovieDetailRouter: class {
-    func navToMovieDetail(id: Int)
+    // do someting...
 }
 
 class MovieDetailRouter: IMovieDetailRouter {
@@ -19,11 +19,5 @@ class MovieDetailRouter: IMovieDetailRouter {
 
     init(view: MovieDetailViewController?) {
         self.view = view
-    }
-
-    func navToMovieDetail(id: Int) {
-        view?.navigate(type: .push, module: GeneralRoute.movieDetail(parameter: [
-            "id": id
-        ]), completion: nil)
     }
 }

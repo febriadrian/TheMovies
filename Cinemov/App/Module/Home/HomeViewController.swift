@@ -2,27 +2,14 @@
 //  HomeViewController.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 08/07/20.
-//  Copyright (c) 2020 Febri Adrian. All rights reserved.
-//  Modified VIP Templates by:  * Febri Adrian
-//                              * febriadrian.dev@gmail.com
-//                              * https://github.com/febriadrian
+//  Created by Febri Adrian on 14/07/20.
+//  Copyright © 2020 Febri Adrian. All rights reserved.
+//
 
 import UIKit
 
-enum MovieCategory {
-    case popular
-    case playing
-    case upcoming
-    case toprated
-}
-
-protocol HomeDelegate {
+protocol HomeViewControllerDelegate {
     func scrollToTop()
-}
-
-protocol IHomeViewController: class {
-    var router: IHomeRouter? { get set }
 }
 
 class HomeViewController: UIViewController {
@@ -30,15 +17,13 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var leadingIndicatorConstraint: NSLayoutConstraint!
     @IBOutlet var menuButtons: [UIButton]!
 
-    var interactor: IHomeInteractor?
+    var viewModel: IHomeViewModel?
     var router: IHomeRouter?
-
-    var homeDelegate: HomeDelegate?
-    var mainVC: MainViewController?
-    var popularVC: MoviesViewController!
-    var playingVC: MoviesViewController!
-    var upcomingVC: MoviesViewController!
-    var topRatedVC: MoviesViewController!
+    var popularVC: HomeMoviesViewController!
+    var playingVC: HomeMoviesViewController!
+    var upcomingVC: HomeMoviesViewController!
+    var topRatedVC: HomeMoviesViewController!
+    var delegate: HomeViewControllerDelegate?
 
     let pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
     var viewControllerList: [UIViewController] = []
@@ -52,41 +37,36 @@ class HomeViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        viewModel?.setupParameters()
         setupComponent()
         setupPageViewController()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        mainVC?.mainVCDelegate = self
-    }
-
     private func setupComponent() {
         navigationItem.titleView = UIImageView(image: UIImage(named: "tmdblogo"))
-        mainVC = interactor?.parameters?["mainVC"] as? MainViewController
         screenWidth = UIScreen.main.bounds.width
     }
 
     private func setupPageViewController() {
-        popularVC = MoviesConfiguration.setup(parameters: [
-            "home": self,
+        popularVC = HomeMoviesConfiguration.setup(parameters: [
+            "homevc": self,
             "category": MovieCategory.popular
-        ]) as? MoviesViewController
+        ]) as? HomeMoviesViewController
 
-        playingVC = MoviesConfiguration.setup(parameters: [
-            "home": self,
+        playingVC = HomeMoviesConfiguration.setup(parameters: [
+            "homevc": self,
             "category": MovieCategory.playing
-        ]) as? MoviesViewController
+        ]) as? HomeMoviesViewController
 
-        upcomingVC = MoviesConfiguration.setup(parameters: [
-            "home": self,
+        upcomingVC = HomeMoviesConfiguration.setup(parameters: [
+            "homevc": self,
             "category": MovieCategory.upcoming
-        ]) as? MoviesViewController
+        ]) as? HomeMoviesViewController
 
-        topRatedVC = MoviesConfiguration.setup(parameters: [
-            "home": self,
+        topRatedVC = HomeMoviesConfiguration.setup(parameters: [
+            "homevc": self,
             "category": MovieCategory.toprated
-        ]) as? MoviesViewController
+        ]) as? HomeMoviesViewController
 
         viewControllerList = [popularVC, playingVC, upcomingVC, topRatedVC]
         menuCount = CGFloat(viewControllerList.count)
@@ -124,7 +104,6 @@ class HomeViewController: UIViewController {
 
     private func selectViewController(withIndex index: Int) {
         let viewController = viewControllerList[index]
-        homeDelegate = viewController as? HomeDelegate
 
         pageViewController.setViewControllers(
             [viewController],
@@ -221,12 +200,8 @@ extension HomeViewController: UIScrollViewDelegate {
     }
 }
 
-extension HomeViewController: MainVCDelegate {
+extension HomeViewController: MainViewControllerDelegate {
     func scrollToTop() {
-        homeDelegate?.scrollToTop()
+        delegate?.scrollToTop()
     }
-}
-
-extension HomeViewController: IHomeViewController {
-    // do someting...
 }

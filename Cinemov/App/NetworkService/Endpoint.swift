@@ -2,11 +2,9 @@
 //  Endpoint.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 08/07/20.
-//  Copyright (c) 2020 Febri Adrian. All rights reserved.
-//  Modified VIP Templates by:  * Febri Adrian
-//                              * febriadrian.dev@gmail.com
-//                              * https://github.com/febriadrian
+//  Created by Febri Adrian on 18/07/20.
+//  Copyright © 2020 Febri Adrian. All rights reserved.
+//
 
 import Alamofire
 import Foundation
@@ -16,25 +14,14 @@ enum Endpoint {
     case playingMovies(model: MoviesModel.Request)
     case upcomingMovies(model: MoviesModel.Request)
     case topratedMovies(model: MoviesModel.Request)
-    case movieDetail(model: MovieDetailModel.Request)
+    case discover(model: DiscoverMoviesModel.Request)
     case genres(model: GenresModel.Request)
-    case discover(model: DiscoverModel.Request)
+    case movieDetail(model: MovieDetailModel.Request)
+    case movieSimilar(model: SimilarMoviesModel.Request)
+    case movieReviews(model: ReviewModel.Request)
 }
 
 extension Endpoint: IEndpoint {
-    var method: HTTPMethod {
-        switch self {
-        case .popularMovies,
-             .playingMovies,
-             .upcomingMovies,
-             .topratedMovies,
-             .movieDetail,
-             .genres,
-             .discover:
-            return .get
-        }
-    }
-
     var path: String {
         switch self {
         case .popularMovies:
@@ -45,12 +32,31 @@ extension Endpoint: IEndpoint {
             return Constant.apiBaseUrl + "/movie/upcoming"
         case .topratedMovies:
             return Constant.apiBaseUrl + "/movie/top_rated"
-        case .movieDetail(let model):
-            return Constant.apiBaseUrl + "/movie/\(model.id)"
-        case .genres:
-            return Constant.apiBaseUrl + "/genre/movie/list"
         case .discover:
             return Constant.apiBaseUrl + "/discover/movie"
+        case .genres:
+            return Constant.apiBaseUrl + "/genre/movie/list"
+        case .movieDetail(let model):
+            return Constant.apiBaseUrl + "/movie/\(model.id)"
+        case .movieSimilar(let model):
+            return Constant.apiBaseUrl + "/movie/\(model.id)/similar"
+        case .movieReviews(let model):
+            return Constant.apiBaseUrl + "/movie/\(model.id)/reviews"
+        }
+    }
+
+    var method: HTTPMethod {
+        switch self {
+        case .popularMovies,
+             .playingMovies,
+             .upcomingMovies,
+             .topratedMovies,
+             .discover,
+             .genres,
+             .movieDetail,
+             .movieSimilar,
+             .movieReviews:
+            return .get
         }
     }
 
@@ -64,11 +70,15 @@ extension Endpoint: IEndpoint {
             return model.parameters()
         case .topratedMovies(let model):
             return model.parameters()
-        case .movieDetail(let model):
+        case .discover(let model):
             return model.parameters()
         case .genres(let model):
             return model.parameters()
-        case .discover(let model):
+        case .movieDetail(let model):
+            return model.parameters()
+        case .movieSimilar(let model):
+            return model.parameters()
+        case .movieReviews(let model):
             return model.parameters()
         }
     }
@@ -79,9 +89,11 @@ extension Endpoint: IEndpoint {
              .playingMovies,
              .upcomingMovies,
              .topratedMovies,
-             .movieDetail,
+             .discover,
              .genres,
-             .discover:
+             .movieDetail,
+             .movieSimilar,
+             .movieReviews:
             return URLEncoding.queryString
         }
     }
@@ -89,7 +101,6 @@ extension Endpoint: IEndpoint {
     var header: HTTPHeaders? {
         return [
             "Content-Type": "application/json",
-//            "Cache-Control": "no-cache"
         ]
     }
 }

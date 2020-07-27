@@ -2,11 +2,11 @@
 //  MovieDetailModel.swift
 //  Cinemov
 //
-//  Created by Febri Adrian on 10/07/20.
-//  Copyright (c) 2020 Febri Adrian. All rights reserved.
-//  Modified VIP Templates by:  * Febri Adrian
-//                              * febriadrian.dev@gmail.com
-//                              * https://github.com/febriadrian
+//  Created by Febri Adrian on 20/07/20.
+//  Copyright © 2020 Febri Adrian. All rights reserved.
+//  MVVM + RxSwift Templates by:  * Febri Adrian
+//                                * febriadrian.dev@gmail.com
+//                                * https://github.com/febriadrian
 
 import SwiftyJSON
 
@@ -18,7 +18,7 @@ struct MovieDetailModel {
             return [
                 "api_key": Constant.apiKey,
                 "language": "en-US",
-                "append_to_response": "credits,similar,reviews"
+                "append_to_response": "credits"
             ]
         }
     }
@@ -42,7 +42,6 @@ struct MovieDetailModel {
         var prodCountries: [Others]?
         var credits: Credits?
         var similar: MoviesModel.Response?
-        var reviews: Reviews?
 
         init(data: JSON?) {
             self.title = data?["title"].string
@@ -77,10 +76,6 @@ struct MovieDetailModel {
 
             if let dict = data?["similar"].dictionaryObject {
                 self.similar = MoviesModel.Response(data: JSON(dict))
-            }
-
-            if let dict = data?["reviews"].dictionaryObject {
-                self.reviews = Reviews(data: JSON(dict))
             }
         }
 
@@ -120,26 +115,6 @@ struct MovieDetailModel {
                 }
             }
         }
-
-        struct Reviews {
-            var results: [Results]?
-
-            init(data: JSON?) {
-                if let items = data?["results"].array {
-                    self.results = items.map { Results(data: JSON($0.object)) }
-                }
-            }
-
-            struct Results {
-                var author: String?
-                var content: String?
-
-                init(data: JSON?) {
-                    self.author = data?["author"].string
-                    self.content = data?["content"].string
-                }
-            }
-        }
     }
 
     struct MVDetailModel {
@@ -162,24 +137,10 @@ struct MovieDetailModel {
         var favorite: Bool
     }
 
-    struct PeopleModel {
+    struct PersonModel {
         var name: String
         var profilePath: String
         var character: String
         var job: String
-    }
-
-    struct SimilarModel {
-        var id: Int
-        var title: String
-        var posterPath: String
-        var voteAverage: String
-        var overview: String
-        var releaseDate: String
-    }
-
-    struct ReviewModel {
-        var author: String
-        var content: String
     }
 }
