@@ -176,8 +176,8 @@ class MovieDetailViewModel: IMovieDetailViewModel {
             let x = MovieDetailModel.PersonModel(
                 name: person.name ?? "n/a",
                 profilePath: profilePath ?? "",
-                character: "",
-                job: person.job ?? "n/a"
+                character: person.character ?? "n/a",
+                job: ""
             )
             cast.append(x)
         }
