@@ -140,6 +140,7 @@ extension DiscoverMoviesViewController: LoadingViewDelegate {
 extension DiscoverMoviesViewController: GenresDelegate {
     func didSelectGenres(genreIds: [String]?, selectedIndex: [IndexPath]?) {
         viewModel?.didSelectGenres(genreIds: genreIds, selectedIndex: selectedIndex)
+        collectionView.scrollToItem(at: [0, 0], at: .top, animated: false)
 
         if viewModel?.selectedIndex == nil {
             navigationItem.leftBarButtonItem = nil

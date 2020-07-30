@@ -124,6 +124,7 @@
 		FDDD92C024CD1F4C0062958C /* MovieDetailReviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDDD92B924CD1F4C0062958C /* MovieDetailReviewViewModel.swift */; };
 		FDDD92C124CD1F4C0062958C /* MovieDetailReviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FDDD92BA24CD1F4C0062958C /* MovieDetailReviewViewController.xib */; };
 		FDDD92C224CD1F4C0062958C /* MovieDetailReviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDDD92BB24CD1F4C0062958C /* MovieDetailReviewManager.swift */; };
+		FDF0AA9424D28FC1006827B4 /* BaseTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDF0AA9324D28FC1006827B4 /* BaseTestCase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -273,6 +274,7 @@
 		FDDD92B924CD1F4C0062958C /* MovieDetailReviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailReviewViewModel.swift; sourceTree = "<group>"; };
 		FDDD92BA24CD1F4C0062958C /* MovieDetailReviewViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MovieDetailReviewViewController.xib; sourceTree = "<group>"; };
 		FDDD92BB24CD1F4C0062958C /* MovieDetailReviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailReviewManager.swift; sourceTree = "<group>"; };
+		FDF0AA9324D28FC1006827B4 /* BaseTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTestCase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -556,6 +558,7 @@
 		FD6AADBD24BDA91300150BD5 /* CinemovTests */ = {
 			isa = PBXGroup;
 			children = (
+				FDF0AA9324D28FC1006827B4 /* BaseTestCase.swift */,
 				FD6AADBE24BDA91300150BD5 /* CinemovTests.swift */,
 				FD6AADC024BDA91300150BD5 /* Info.plist */,
 			);
@@ -1063,6 +1066,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FDF0AA9424D28FC1006827B4 /* BaseTestCase.swift in Sources */,
 				FD6AADBF24BDA91300150BD5 /* CinemovTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

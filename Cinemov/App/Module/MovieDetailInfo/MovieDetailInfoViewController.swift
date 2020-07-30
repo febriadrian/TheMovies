@@ -53,6 +53,8 @@ class MovieDetailInfoViewController: UIViewController {
         crewCollectionView.delegate = self
         castCollectionView.registerCellType(PeopleCollectionViewCell.self)
         crewCollectionView.registerCellType(PeopleCollectionViewCell.self)
+
+        taglineLabel.font = UIFont.systemFont(ofSize: 16).italic()
     }
 
     override func viewDidAppear(_ animated: Bool) {
