@@ -212,17 +212,19 @@ class MovieDetailViewModel: IMovieDetailViewModel {
         var trailers = [MovieDetailModel.YoutubeTrailerModel]()
         
         for video in videos {
-            let key = video.key ?? ""
-            
-            let videoUrl = URL(string: "https://www.youtube.com/watch?v=\(key)")
-            let thumbnailUrl = "https://img.youtube.com/vi/\(key)/0.jpg"
-            
-            let trailer = MovieDetailModel.YoutubeTrailerModel(
-                videoUrl: videoUrl!,
-                thumbnailUrl: thumbnailUrl
-            )
-            
-            trailers.append(trailer)
+            if video.site?.lowercased() == "youtube", video.type?.lowercased() == "trailer" {
+                let key = video.key ?? ""
+                
+                let videoUrl = URL(string: "https://www.youtube.com/watch?v=\(key)")
+                let thumbnailUrl = "https://img.youtube.com/vi/\(key)/0.jpg"
+                
+                let trailer = MovieDetailModel.YoutubeTrailerModel(
+                    videoUrl: videoUrl!,
+                    thumbnailUrl: thumbnailUrl
+                )
+                
+                trailers.append(trailer)
+            }
         }
         
         return trailers
