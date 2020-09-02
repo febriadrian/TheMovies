@@ -187,6 +187,11 @@ class MovieDetailViewController: UIViewController {
             .observeOn(MainScheduler.instance)
             .bind(to: infoVC.crew)
             .disposed(by: disposeBag)
+
+        viewModel?.trailers
+            .observeOn(MainScheduler.instance)
+            .bind(to: infoVC.trailers)
+            .disposed(by: disposeBag)
     }
 
     @objc private func didTapFavoriteButton() {

@@ -27,6 +27,8 @@ class MovieDetailInfoViewController: UIViewController {
     @IBOutlet weak var castView: UIView!
     @IBOutlet weak var crewView: UIView!
     @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var trailerView: UIView!
+    @IBOutlet weak var trailerCollectionView: UICollectionView!
 
     var main: MovieDetailViewController?
     var scrollDelegate: MovieDetailScrollDelegate?
@@ -35,6 +37,7 @@ class MovieDetailInfoViewController: UIViewController {
     var detail: PublishSubject<MovieDetailModel.MVDetailModel> = PublishSubject()
     var cast: PublishSubject<[MovieDetailModel.PersonModel]> = PublishSubject()
     var crew: PublishSubject<[MovieDetailModel.PersonModel]> = PublishSubject()
+    var trailers: PublishSubject<[MovieDetailModel.YoutubeTrailerModel]> = PublishSubject()
     private let disposeBag = DisposeBag()
 
     var lastYOffset: CGFloat = 0
@@ -49,8 +52,11 @@ class MovieDetailInfoViewController: UIViewController {
         main = viewModel?.parameters?["main"] as? MovieDetailViewController
 
         scrollView.delegate = self
+
+        trailerCollectionView.delegate = self
         castCollectionView.delegate = self
         crewCollectionView.delegate = self
+        trailerCollectionView.registerCellType(TrailerCollectionViewCell.self)
         castCollectionView.registerCellType(PeopleCollectionViewCell.self)
         crewCollectionView.registerCellType(PeopleCollectionViewCell.self)
 
@@ -77,22 +83,37 @@ class MovieDetailInfoViewController: UIViewController {
             }
             .disposed(by: disposeBag)
 
-        cast
-            .bind(to: castCollectionView.rx.items(cellIdentifier: "PeopleCollectionViewCell", cellType: PeopleCollectionViewCell.self)) { _, person, cell in
-                cell.setupPersonView(person: person)
-            }
-            .disposed(by: disposeBag)
+        cast.bind(to: castCollectionView.rx.items(cellIdentifier: "PeopleCollectionViewCell", cellType: PeopleCollectionViewCell.self)) { _, person, cell in
+            cell.setupPersonView(person: person)
+        }.disposed(by: disposeBag)
 
-        crew
-            .bind(to: crewCollectionView.rx.items(cellIdentifier: "PeopleCollectionViewCell", cellType: PeopleCollectionViewCell.self)) { _, person, cell in
-                cell.setupPersonView(person: person)
-            }
+        crew.bind(to: crewCollectionView.rx.items(cellIdentifier: "PeopleCollectionViewCell", cellType: PeopleCollectionViewCell.self)) { _, person, cell in
+            cell.setupPersonView(person: person)
+        }.disposed(by: disposeBag)
+
+        trailers.bind(to: trailerCollectionView.rx.items(cellIdentifier: "TrailerCollectionViewCell", cellType: TrailerCollectionViewCell.self)) { _, trailer, cell in
+            cell.setupView(trailer: trailer)
+        }.disposed(by: disposeBag)
+
+        trailerCollectionView.rx
+            .itemSelected
+            .subscribe(onNext: { indexPath in
+                guard let videoUrl = self.main?.viewModel?.trailersArray[indexPath.item].videoUrl else {
+                    return
+                }
+
+                guard UIApplication.shared.canOpenURL(videoUrl) else { return }
+                UIApplication.shared.open(videoUrl, options: [:], completionHandler: nil)
+            })
             .disposed(by: disposeBag)
     }
 }
 
 extension MovieDetailInfoViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if collectionView == trailerCollectionView {
+            return CGSize(width: 177, height: 118)
+        }
         return CGSize(width: 84, height: 118)
     }
 }

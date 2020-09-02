@@ -24,8 +24,10 @@ class MovieDetailInfoTableViewCell: UITableViewCell {
     @IBOutlet weak var countriesLabel: UILabel!
     @IBOutlet weak var originalTitleLabel: UILabel!
     @IBOutlet weak var taglineLabel: UILabel!
+    @IBOutlet weak var trailerCollectionView: UICollectionView!
     @IBOutlet weak var castCollectionView: UICollectionView!
     @IBOutlet weak var crewCollectionView: UICollectionView!
+    @IBOutlet weak var trailerView: UIView!
     @IBOutlet weak var castView: UIView!
     @IBOutlet weak var crewView: UIView!
 
@@ -46,8 +48,10 @@ class MovieDetailInfoTableViewCell: UITableViewCell {
         let italic = UIFont.systemFont(ofSize: 16, weight: .bold).italic()
         taglineLabel.font = italic
 
+        trailerCollectionView.delegate = self
         castCollectionView.delegate = self
         crewCollectionView.delegate = self
+        trailerCollectionView.registerCellType(TrailerCollectionViewCell.self)
         castCollectionView.registerCellType(PeopleCollectionViewCell.self)
         crewCollectionView.registerCellType(PeopleCollectionViewCell.self)
 
@@ -83,6 +87,7 @@ class MovieDetailInfoTableViewCell: UITableViewCell {
         } else {
             overviewLabel.numberOfLines = 0
         }
+
         delegate?.updateCell()
     }
 
@@ -93,6 +98,9 @@ class MovieDetailInfoTableViewCell: UITableViewCell {
 
 extension MovieDetailInfoTableViewCell: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if collectionView == trailerCollectionView {
+            return CGSize(width: 236, height: 118)
+        }
         return CGSize(width: 84, height: 118)
     }
 }

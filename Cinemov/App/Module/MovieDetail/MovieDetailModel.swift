@@ -18,7 +18,7 @@ struct MovieDetailModel {
             return [
                 "api_key": Constant.apiKey,
                 "language": "en-US",
-                "append_to_response": "credits"
+                "append_to_response": "credits,videos"
             ]
         }
     }
@@ -42,6 +42,7 @@ struct MovieDetailModel {
         var prodCountries: [Others]?
         var credits: Credits?
         var similar: MoviesModel.Response?
+        var videos: Videos?
 
         init(data: JSON?) {
             self.title = data?["title"].string
@@ -76,6 +77,10 @@ struct MovieDetailModel {
 
             if let dict = data?["similar"].dictionaryObject {
                 self.similar = MoviesModel.Response(data: JSON(dict))
+            }
+
+            if let dict = data?["videos"].dictionaryObject {
+                self.videos = Videos(data: JSON(dict))
             }
         }
 
@@ -115,6 +120,30 @@ struct MovieDetailModel {
                 }
             }
         }
+
+        struct Videos {
+            var results: [Detail]?
+
+            init(data: JSON?) {
+                if let items = data?["results"].array {
+                    self.results = items.map { Detail(data: JSON($0.object)) }
+                }
+            }
+
+            struct Detail {
+                var site: String?
+                var type: String?
+                var name: String?
+                var key: String?
+
+                init(data: JSON?) {
+                    self.site = data?["site"].string
+                    self.type = data?["type"].string
+                    self.name = data?["name"].string
+                    self.key = data?["key"].string
+                }
+            }
+        }
     }
 
     struct MVDetailModel {
@@ -142,5 +171,10 @@ struct MovieDetailModel {
         var profilePath: String
         var character: String
         var job: String
+    }
+
+    struct YoutubeTrailerModel {
+        var videoUrl: URL
+        var thumbnailUrl: String
     }
 }

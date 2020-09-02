@@ -12,16 +12,23 @@ import Foundation
 import RxCocoa
 import RxSwift
 
+enum CreditsType {
+    case cast
+    case crew
+}
+
 protocol IMovieDetailViewModel: class {
     var parameters: [String: Any]? { get }
     var detail: PublishSubject<MovieDetailModel.MVDetailModel> { get }
     var cast: PublishSubject<[MovieDetailModel.PersonModel]> { get }
     var crew: PublishSubject<[MovieDetailModel.PersonModel]> { get }
+    var trailers: PublishSubject<[MovieDetailModel.YoutubeTrailerModel]> { get }
     var result: PublishSubject<GeneralResult> { get }
     var favorite: PublishSubject<Bool> { get }
     var isInitialLoading: Bool { get }
     var id: Int? { get }
     var movieTitle: String { get }
+    var trailersArray: [MovieDetailModel.YoutubeTrailerModel] { get }
     
     func setupParameters()
     func getMovieDetail()
@@ -34,6 +41,7 @@ class MovieDetailViewModel: IMovieDetailViewModel {
     var detail: PublishSubject<MovieDetailModel.MVDetailModel> = PublishSubject()
     var cast: PublishSubject<[MovieDetailModel.PersonModel]> = PublishSubject()
     var crew: PublishSubject<[MovieDetailModel.PersonModel]> = PublishSubject()
+    var trailers: PublishSubject<[MovieDetailModel.YoutubeTrailerModel]> = PublishSubject()
     var result: PublishSubject<GeneralResult> = PublishSubject()
     var favorite: PublishSubject<Bool> = PublishSubject()
     var detailValue: MovieDetailModel.MVDetailModel!
@@ -41,6 +49,7 @@ class MovieDetailViewModel: IMovieDetailViewModel {
     var isFavorite: Bool = false
     var id: Int?
     var movieTitle: String = ""
+    var trailersArray: [MovieDetailModel.YoutubeTrailerModel] = []
     
     func setupParameters() {
         id = parameters?["id"] as? Int
@@ -67,17 +76,19 @@ class MovieDetailViewModel: IMovieDetailViewModel {
     func getMovieDetail() {
         guard let id = id else { return }
         manager?.getMovieDetail(id: id, success: { response in
-            
             self.detailValue = self.setupDetailViewModel(response: response)
             self.movieTitle = self.detailValue.title
             self.isFavorite = self.detailValue.favorite
             self.detail.onNext(self.detailValue)
             
-            let cast = self.setupCastViewModel(response: response)
+            let cast = self.setupPeopleViewModel(type: .cast, data: response.credits?.cast)
             self.cast.onNext(cast)
             
-            let crew = self.setupCrewViewModel(response: response)
+            let crew = self.setupPeopleViewModel(type: .crew, data: response.credits?.crew)
             self.crew.onNext(crew)
+            
+            self.trailersArray = self.setupTrailerViewModel(videos: response.videos)
+            self.trailers.onNext(self.trailersArray)
             
             self.result.onNext(.success)
         }, failure: { error in
@@ -163,48 +174,58 @@ class MovieDetailViewModel: IMovieDetailViewModel {
         return detail
     }
     
-    private func setupCastViewModel(response: MovieDetailModel.Response) -> [MovieDetailModel.PersonModel] {
-        guard let credits = response.credits?.cast else { return [] }
-        var cast = [MovieDetailModel.PersonModel]()
+    private func setupPeopleViewModel(type: CreditsType, data: [MovieDetailModel.Response.Credits.Detail]?) -> [MovieDetailModel.PersonModel] {
+        guard let data = data else { return [] }
+        var people = [MovieDetailModel.PersonModel]()
         
-        for person in credits {
+        for person in data {
             var profilePath: String?
             if let path = person.profilePath, !path.isEmpty {
                 profilePath = ImageUrl.profile + path
             }
             
-            let x = MovieDetailModel.PersonModel(
-                name: person.name ?? "n/a",
-                profilePath: profilePath ?? "",
-                character: person.character ?? "n/a",
-                job: ""
-            )
-            cast.append(x)
+            switch type {
+            case .cast:
+                let cast = MovieDetailModel.PersonModel(
+                    name: person.name ?? "n/a",
+                    profilePath: profilePath ?? "",
+                    character: person.character ?? "n/a",
+                    job: ""
+                )
+                people.append(cast)
+            case .crew:
+                let crew = MovieDetailModel.PersonModel(
+                    name: person.name ?? "n/a",
+                    profilePath: profilePath ?? "",
+                    character: "",
+                    job: person.job ?? "n/a"
+                )
+                people.append(crew)
+            }
         }
         
-        return cast
+        return people
     }
     
-    private func setupCrewViewModel(response: MovieDetailModel.Response) -> [MovieDetailModel.PersonModel] {
-        guard let credits = response.credits?.crew else { return [] }
-        var crew = [MovieDetailModel.PersonModel]()
+    private func setupTrailerViewModel(videos: MovieDetailModel.Response.Videos?) -> [MovieDetailModel.YoutubeTrailerModel] {
+        guard let videos = videos?.results else { return [] }
+        var trailers = [MovieDetailModel.YoutubeTrailerModel]()
         
-        for person in credits {
-            var profilePath: String?
-            if let path = person.profilePath, !path.isEmpty {
-                profilePath = ImageUrl.profile + path
-            }
+        for video in videos {
+            let key = video.key ?? ""
             
-            let x = MovieDetailModel.PersonModel(
-                name: person.name ?? "n/a",
-                profilePath: profilePath ?? "",
-                character: "",
-                job: person.job ?? "n/a"
+            let videoUrl = URL(string: "https://www.youtube.com/watch?v=\(key)")
+            let thumbnailUrl = "https://img.youtube.com/vi/\(key)/0.jpg"
+            
+            let trailer = MovieDetailModel.YoutubeTrailerModel(
+                videoUrl: videoUrl!,
+                thumbnailUrl: thumbnailUrl
             )
-            crew.append(x)
+            
+            trailers.append(trailer)
         }
         
-        return crew
+        return trailers
     }
     
     private func getString(from genresArr: [MovieDetailModel.Response.Others]) -> String? {
